@@ -1,0 +1,49 @@
+ # ----------------------------------------------------------------------------------------
+    # Kernel selection for CS-RFB
+    # ----------------------------------------------------------------------------------------
+
+    kernel = CS_RBF2D (2)
+
+    # ----------------------------------------------------------------------------------------
+    # Gramm matrix allocation
+    # ----------------------------------------------------------------------------------------
+
+    matrix = GrammMatrix (dst)
+    matrix.fillMatrixLaplace2D (kernel, D)
+    # ----------------------------------------------------------------------------------------
+    # Dirichlet boundary condition
+    # ----------------------------------------------------------------------------------------
+
+    matrix.setDirichletRegular (T1, 3)
+    # print(dst.NI(), dst.NB(), test[dst.NI():], len(test[dst.NI():]), len(test[0:dst.NI()]))
+
+    # ----------------------------------------------------------------------------------------
+    # Gram matrix solution
+    # ----------------------------------------------------------------------------------------
+
+    solv = Solver (matrix, 'gmres')
+    solv.solve ()
+    solv.evaluate (kernel)
+
+    # ----------------------------------------------------------------------------------------
+    # Solution storage(optional)
+    # ----------------------------------------------------------------------------------------
+
+    zx = solv.interpolate (kernel)
+    u = solv.getSol ()
+    lam = solv.lam ()
+
+    # ----------------------------------------------------------------------------------------
+    # Solution and point cloud plotting
+    # ----------------------------------------------------------------------------------------
+    title = 'Heat difussion in two dimensional domain'
+    xlabel = 'Lx [m]'
+    ylabel = 'Ly [m]'
+    barlabel = 'Temparature °C'
+    plot = plotter (solv, kernel)
+    # plot.regularMesh2D (title='Spatial created grid', xlabel=xlabel, ylabel=ylabel)
+    plot.surface3D (title=title, xlabel=xlabel, ylabel=ylabel, barlabel=barlabel)
+    plot.levelplot (title=title, xlabel=xlabel, ylabel=ylabel, barlabel=barlabel)
+
+    plt.spy (matrix.getMatrix (), markersize=1.0)
+    plt.show ()
